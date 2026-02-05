@@ -1,0 +1,7 @@
+Category,Item,Value,Unit,Description
+Glovis,Logistics_Margin,4.5,Percent,Operating_Profit_Ratio_Logistics
+Glovis,Shipping_Margin,6.8,Percent,Operating_Profit_Ratio_Shipping
+Glovis,Distribution_Cost,12.5,Percent,CKD_Packaging_Warehousing_Est
+Glovis,Credit_Terms,60,Days,Avg_Receivable_Turnover
+Market,Exchange_Rate,1380,KRW/USD,Base_Rate_2025_3Q
+Risk,Biz_Risk_Factor,1.05,Multiplier,Geopolitical_Risk_Adjustment

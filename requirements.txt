@@ -1,0 +1,34 @@
+# ============================================
+# NexTrade ERP - Python Dependencies
+# ============================================
+
+# Web Framework
+streamlit
+
+# Data Processing
+pandas
+openpyxl
+
+# AI / LLM
+openai
+anthropic
+
+# Search Engine
+tavily-python
+
+# Document Generation
+python-docx
+
+# Visualization
+plotly
+pydeck
+
+# Finance / Market Data
+yfinance
+
+# Translation
+deep-translator
+
+# Environment & HTTP
+python-dotenv
+requests

@@ -1,0 +1,14 @@
+Category,Route,Unit,Price_2025_3Q,Note
+
+HMM,Asia-Europe,USD/TEU,1481,SCFI_Avg_Reflected
+
+HMM,Intra-Asia,USD/TEU,650,Regional_Avg_Est
+
+HMM,Trans-Pacific,USD/TEU,2150,US_West_Coast_Avg
+
+Index,SCFI_Composite,Point,1481,Market_Fact_2025_3Q
+
+Risk,Sur-Charge,Percent,15,Bunker_Adjustment_Factor
+
+Risk,Rail-Add,Percent,20,Inland_Transport_Premium
+

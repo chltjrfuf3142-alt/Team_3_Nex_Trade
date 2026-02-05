@@ -1,0 +1,7 @@
+Category,Item,Value,Unit,Description
+LX_Pantos,Inland_Biz_Share,28.5,Percent,W&D_Land_Transport_Revenue_Share
+LX_Pantos,Rail_Biz_Margin,3.8,Percent,Operating_Profit_Ratio_Logistics
+LX_Pantos,Storage_Handling_Cost,11.2,Percent,Warehouse_Distribution_Cost_Est
+Standard,Rail_Unit_Price_TCR,0.75,USD/km,TCR_Block_Train_Est_Rate
+Standard,Trucking_Unit_Price,1.4,USD/km,CIS_Local_Trucking_Avg
+Risk,Inland_SurCharge,10.0,Percent,Fuel_Risk_Adjustment
