@@ -16,6 +16,13 @@ from docx import Document
 import tempfile
 import base64
 
+# PDF 뷰어 (Streamlit 컴포넌트)
+try:
+    from streamlit_pdf_viewer import pdf_viewer
+    HAS_PDF_VIEWER = True
+except ImportError:
+    HAS_PDF_VIEWER = False
+
 # docx2pdf는 클라우드에서 작동하지 않음 (Microsoft Word 필요)
 try:
     from docx2pdf import convert
@@ -633,20 +640,31 @@ def run_offer_generator():
                 st.error(f"미리보기 생성 실패: {e}")
                 st.exception(e)
 
-    # PDF 미리보기 표시 (로컬에서만 가능)
+    # PDF 미리보기 표시
     if 'preview_pdf' in st.session_state and st.session_state['preview_pdf']:
         st.markdown("---")
         st.markdown("#### 📄 문서 미리보기")
 
-        # PDF를 base64로 인코딩하여 iframe으로 표시
-        base64_pdf = base64.b64encode(st.session_state['preview_pdf']).decode('utf-8')
-        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800" type="application/pdf"></iframe>'
-        st.markdown(pdf_display, unsafe_allow_html=True)
+        # streamlit-pdf-viewer 사용 (브라우저 보안 문제 없음)
+        if HAS_PDF_VIEWER:
+            pdf_viewer(st.session_state['preview_pdf'], height=800)
+        else:
+            # fallback: 다운로드 버튼만 표시
+            st.info("💡 PDF 뷰어가 설치되지 않았습니다. 파일을 다운로드하세요.")
+            st.download_button(
+                label="📥 PDF 다운로드",
+                data=st.session_state['preview_pdf'],
+                file_name=f"{st.session_state.get('preview_filename', 'Preview')}.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+                type="primary",
+                key="preview_pdf_download"
+            )
 
         st.markdown("---")
     elif 'preview_docx' in st.session_state:
         st.markdown("---")
-        st.info("💡 PDF 미리보기가 지원되지 않는 환경입니다. Word 파일을 다운로드하세요.")
+        st.info("💡 PDF 변환이 지원되지 않는 환경입니다. Word 파일을 다운로드하세요.")
 
         # Word 다운로드만 표시
         st.download_button(
@@ -655,7 +673,8 @@ def run_offer_generator():
             file_name=f"{st.session_state.get('preview_filename', 'Preview')}.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             use_container_width=True,
-            type="primary"
+            type="primary",
+            key="preview_docx_download"
         )
 
     st.markdown("---")

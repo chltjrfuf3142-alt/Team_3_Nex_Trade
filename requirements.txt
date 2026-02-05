@@ -19,6 +19,7 @@ tavily-python
 # Document Generation
 python-docx
 reportlab
+streamlit-pdf-viewer
 
 # Visualization
 plotly
