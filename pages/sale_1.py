@@ -184,101 +184,16 @@ def main():
 
     # Tab 핸들러 import
     try:
-        from modules.sales.tab_handlers import (
-            run_market_research,
-            run_offer_generator_with_send  # ← 자동 송부 기능 포함 버전
-        )
-    except ImportError:
-        # 모듈이 없으면 기본 핸들러 사용
-        try:
-            from modules.sales.tab_handlers import (
-                run_market_research,
-                run_offer_generator
-            )
-            # 자동 송부 기능 래퍼 추가
-            def run_offer_generator_with_send():
-                """오퍼시트 생성 + 자동 송부 버튼 통합 버전"""
-                import datetime
-                
-                # 기존 오퍼 생성 로직 실행
-                run_offer_generator()
-                
-                # ★★★ [추가] 자동 송부 버튼 ★★★
-                if 'generated_offers' in st.session_state and st.session_state['generated_offers']:
-                    st.markdown("---")
-                    st.markdown("### 📧 Offer Sheet 자동 송부")
-                    
-                    # 선택된 바이어 정보 가져오기
-                    selected_buyers = st.session_state.get('selected_buyers_full', [])
-                    
-                    if selected_buyers:
-                        for buyer in selected_buyers:
-                            buyer_name = buyer.get('Name', '선택된 바이어')
-                            buyer_email = buyer.get('Email', 'N/A')
-                            
-                            col1, col2 = st.columns([3, 1])
-                            with col1:
-                                st.write(f"**{buyer_name}** ({buyer_email})")
-                            with col2:
-                                if st.button(f"📧 송부", key=f"send_{buyer.get('id', 0)}", type="primary", use_container_width=True):
-                                    # 송부 완료 알림
-                                    st.success(f"✅ **{buyer_name}** 에 Offer Sheet를 송부하였습니다!")
-                                    st.balloons()
-                                    
-                                    # 상세 정보 표시
-                                    with st.expander("📬 송부 상세 정보", expanded=True):
-                                        st.write(f"**수신 회사:** {buyer_name}")
-                                        st.write(f"**수신 이메일:** {buyer_email}")
-                                        st.write(f"**송부 일시:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                                        st.write(f"**첨부 파일:** OfferSheet_{datetime.date.today().strftime('%Y%m%d')}.docx")
-                    else:
-                        st.info("💡 Tab1에서 바이어를 먼저 선택해주세요.")
-                        
-        except ImportError as e:
-            st.error(f"모듈을 불러올 수 없습니다: {e}")
-            return
+        from modules.sales.tab_handlers import run_market_research, run_offer_generator
+    except ImportError as e:
+        st.error(f"모듈을 불러올 수 없습니다: {e}")
+        return
 
     with tab1:
         run_market_research()
 
     with tab2:
-        try:
-            run_offer_generator_with_send()
-        except:
-            # fallback: 기본 함수만 실행
-            run_offer_generator()
-            
-            # ★★★ [자동 송부 기능 추가 - Inline 버전] ★★★
-            st.markdown("---")
-            st.markdown("### 📧 Offer Sheet 자동 송부")
-            
-            # 선택된 바이어 정보 가져오기
-            selected_buyers = st.session_state.get('selected_buyers_full', [])
-            
-            if selected_buyers:
-                for buyer in selected_buyers:
-                    buyer_name = buyer.get('Name', '선택된 바이어')
-                    buyer_email = buyer.get('Email', 'N/A')
-                    
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        st.write(f"**{buyer_name}** ({buyer_email})")
-                    with col2:
-                        if st.button(f"📧 송부", key=f"send_{buyer.get('id', 0)}", type="primary", use_container_width=True):
-                            import datetime
-                            
-                            # 송부 완료 알림
-                            st.success(f"✅ **{buyer_name}** 에 Offer Sheet를 송부하였습니다!")
-                            st.balloons()
-                            
-                            # 상세 정보 표시
-                            with st.expander("📬 송부 상세 정보", expanded=True):
-                                st.write(f"**수신 회사:** {buyer_name}")
-                                st.write(f"**수신 이메일:** {buyer_email}")
-                                st.write(f"**송부 일시:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                                st.write(f"**첨부 파일:** OfferSheet_{datetime.date.today().strftime('%Y%m%d')}.docx")
-            else:
-                st.info("💡 Tab1에서 바이어를 먼저 선택해주세요.")
+        run_offer_generator()
 
     # 푸터
     st.markdown("<div class='footer'>NexTrade 통합 시스템 v2.0 © 2026</div>",

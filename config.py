@@ -1,6 +1,27 @@
 # config.py
 
 import os
+import streamlit as st
+from dotenv import load_dotenv
+
+# .env 파일 로드 (로컬 환경용)
+load_dotenv()
+
+def get_env(key: str, default: str = None) -> str:
+    """
+    환경변수를 가져오는 헬퍼 함수
+    - 클라우드 배포: st.secrets 사용
+    - 로컬 개발: os.getenv 사용
+    """
+    # 1. Streamlit Cloud secrets 확인
+    try:
+        if key in st.secrets:
+            return st.secrets[key]
+    except:
+        pass
+
+    # 2. 로컬 환경변수 확인
+    return os.getenv(key, default)
 
 # 1. 현재 파일(config.py)이 있는 위치 (TradeNex 루트)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

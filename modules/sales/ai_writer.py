@@ -1,6 +1,15 @@
 import os
+import sys
 from openai import OpenAI
 from deep_translator import GoogleTranslator
+
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
 
 # Claude(Anthropic) 라이브러리 체크
 try:
@@ -11,8 +20,8 @@ except ImportError:
 
 class AIOfferWriter:
     def __init__(self):
-        self.openai_key = os.getenv("OPENAI_API_KEY")
-        self.anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+        self.openai_key = get_env("OPENAI_API_KEY")
+        self.anthropic_key = get_env("ANTHROPIC_API_KEY")
 
     def generate_email(self, model_choice, product, price, terms):
         """OpenAI 또는 Claude를 사용하여 오퍼 메일 작성"""

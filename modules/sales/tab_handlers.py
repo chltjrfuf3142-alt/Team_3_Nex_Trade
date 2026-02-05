@@ -302,7 +302,7 @@ def run_offer_generator():
         df_margin = pd.read_csv(margin_file)
 
         category_options = df_margin['Category_Name'].tolist()
-        selected_category = st.selectbox("카테고리", category_options, label_visibility="collapsed")
+        selected_category = st.selectbox("카테고리", category_options, label_visibility="collapsed", key="margin_category_select")
 
         selected_row = df_margin[df_margin['Category_Name'] == selected_category].iloc[0]
         margin_rate = selected_row['Margin_Rate']

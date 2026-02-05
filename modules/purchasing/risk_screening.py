@@ -1,20 +1,23 @@
 import streamlit as st
 import pandas as pd
 import os
-from dotenv import load_dotenv
+import sys
 from openai import OpenAI
 import time
 
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
+
 def run_risk_screening():
     # -------------------------------------------------------------------------
-    # [Setup] 환경 설정
+    # [Setup] 환경 설정 (클라우드 + 로컬 지원)
     # -------------------------------------------------------------------------
-    current_dir = os.path.dirname(os.path.abspath(__file__))  # modules/purchasing/
-    root_dir = os.path.dirname(os.path.dirname(current_dir))   # Nex_Trade/ (수정됨)
-    env_path = os.path.join(root_dir, '.env')
-    load_dotenv(dotenv_path=env_path)
-    
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    OPENAI_API_KEY = get_env("OPENAI_API_KEY")
     client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
     st.markdown("### 3단계: 공급사 리스크 정밀 진단 (Screening)")

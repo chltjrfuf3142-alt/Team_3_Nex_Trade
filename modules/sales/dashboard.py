@@ -6,6 +6,7 @@
 """
 
 import os
+import sys
 from datetime import date
 import streamlit as st
 import pandas as pd
@@ -14,10 +15,18 @@ import yfinance as yf
 import requests
 from deep_translator import GoogleTranslator
 
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
+
 
 def fetch_exchange_rate():
     """ExchangeRate-API를 통해 실시간 환율 가져오기"""
-    api_key = os.getenv("EXCHANGE_RATE_KEY")
+    api_key = get_env("EXCHANGE_RATE_KEY")
 
     if not api_key:
         return None, "API 키 없음"
@@ -39,7 +48,7 @@ def fetch_exchange_rate():
 @st.cache_data(ttl=600)
 def fetch_news():
     """NewsAPI를 통해 실시간 무역/금융 뉴스 가져오기 (한글 번역)"""
-    api_key = os.getenv("NEWS_API_KEY")
+    api_key = get_env("NEWS_API_KEY")
 
     if not api_key:
         # API 키 없을 때 더미 데이터

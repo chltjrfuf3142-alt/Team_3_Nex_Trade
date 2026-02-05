@@ -1,13 +1,15 @@
 import os
+import sys
 import requests
 import urllib.parse
-from dotenv import load_dotenv
 
-# .env 경로 설정
+# 경로 설정
 current_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-env_path = os.path.join(root_dir, '.env')
-load_dotenv(env_path)
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
 
 def get_hs_code(keyword):
     """
@@ -15,9 +17,9 @@ def get_hs_code(keyword):
     """
     # [내장된 표준 URL]
     url = "https://apis.data.go.kr/1220000/retrieveHsCode/getHsCodeList"
-    
-    # .env에서 인증키 가져오기
-    service_key = os.getenv("HS_SEARCH_API")
+
+    # 클라우드 + 로컬 환경 지원
+    service_key = get_env("HS_SEARCH_API")
     
     if not service_key:
         return {"error": "HS_SEARCH_API 키가 없습니다."}
@@ -52,7 +54,7 @@ def get_tariff_rate(hs_code):
     관세율 조회 API 호출
     """
     url = "https://apis.data.go.kr/1220000/retrieveTariff/getTariffList"
-    service_key = os.getenv("RATE_BASIC_API")
+    service_key = get_env("RATE_BASIC_API")
     
     if not service_key:
         return None

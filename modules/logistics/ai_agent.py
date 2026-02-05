@@ -1,13 +1,22 @@
 # modules/logistics/ai_agent.py
 
 import os
+import sys
 from openai import OpenAI
+
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
 
 class AIAgent:
     """물류 AI 컨설턴트"""
-    
+
     def __init__(self, api_key=None):
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.api_key = api_key or get_env("OPENAI_API_KEY")
         if self.api_key:
             self.client = OpenAI(api_key=self.api_key)
         else:

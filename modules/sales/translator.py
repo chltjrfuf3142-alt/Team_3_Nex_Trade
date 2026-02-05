@@ -5,9 +5,17 @@ OpenAI 번역 모듈
 """
 
 import os
+import sys
 import json
 import streamlit as st
 
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
 
 # 국가별 언어 정보
 COUNTRIES = {
@@ -35,9 +43,9 @@ COUNTRIES = {
 
 def translate_offer_data(form_data: dict, items: list, target_language: str):
     """OpenAI API를 사용하여 Offer Sheet 번역"""
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = get_env("OPENAI_API_KEY")
     if not api_key:
-        st.error("⚠️ OPENAI_API_KEY가 .env에 없습니다.")
+        st.error("⚠️ OPENAI_API_KEY가 설정되지 않았습니다.")
         return None
 
     try:

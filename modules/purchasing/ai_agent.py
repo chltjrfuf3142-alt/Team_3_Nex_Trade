@@ -1,13 +1,15 @@
 import json
 from openai import OpenAI
 import os
-from dotenv import load_dotenv
+import sys
 
-# .env 경로 설정 (상위 폴더 탐색)
+# 경로 설정
 current_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-env_path = os.path.join(root_dir, '.env')
-load_dotenv(env_path)
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
 
 class PurchasingAgent:
     """
@@ -15,28 +17,14 @@ class PurchasingAgent:
     역할: 사용자 자연어 -> 관세청 검색용 표준 키워드 변환
     """
     def __init__(self):
-        # ★★★ [수정] 여러 변수명 시도 + 디버깅 출력 ★★★
-        api_key = (
-            os.getenv("OPENAI_API_KEY") or
-            os.getenv("OPEN_AI_API_KEY") or
-            os.getenv("OPEN_AI_API")
-        )
-        
-        # 디버깅: API 키 존재 여부 확인
+        # 클라우드 + 로컬 환경 지원
+        api_key = get_env("OPENAI_API_KEY")
+
         if not api_key:
-            print("=" * 60)
             print("🚨 OpenAI API 키를 찾을 수 없습니다!")
-            print(f"📁 .env 파일 위치: {env_path}")
-            print(f"✓ 파일 존재 여부: {os.path.exists(env_path)}")
-            print("\n현재 환경변수 값:")
-            print(f"  - OPENAI_API_KEY: {bool(os.getenv('OPENAI_API_KEY'))}")
-            print(f"  - OPEN_AI_API_KEY: {bool(os.getenv('OPEN_AI_API_KEY'))}")
-            print(f"  - OPEN_AI_API: {bool(os.getenv('OPEN_AI_API'))}")
-            print("=" * 60)
         else:
-            # 성공 시 키의 앞 10자만 출력 (보안)
             print(f"✅ OpenAI API 키 로드 성공: {api_key[:10]}...")
-        
+
         self.client = OpenAI(api_key=api_key) if api_key else None
         self.api_available = bool(api_key)
         

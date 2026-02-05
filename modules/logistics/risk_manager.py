@@ -1,13 +1,22 @@
 # modules/logistics/risk_manager.py (AI 버전)
 
 import os
+import sys
 from openai import OpenAI
+
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
 
 class StrategicGoodsAnalyzer:
     """AI 기반 전략물자 자동 판별 시스템"""
-    
+
     def __init__(self, api_key=None):
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.api_key = api_key or get_env("OPENAI_API_KEY")
         if self.api_key:
             self.client = OpenAI(api_key=self.api_key)
         else:
@@ -111,11 +120,11 @@ class StrategicGoodsAnalyzer:
 
 def analyze_cargo_context(product_name):
     """AI 기반 화물 특성 분석"""
-    
-    api_key = os.getenv("OPENAI_API_KEY")
+
+    api_key = get_env("OPENAI_API_KEY")
     if not api_key:
         return _fallback_cargo_analysis(product_name)
-    
+
     try:
         client = OpenAI(api_key=api_key)
         

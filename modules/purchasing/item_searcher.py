@@ -1,12 +1,20 @@
 import streamlit as st
 import pandas as pd
 import os
-from dotenv import load_dotenv
+import sys
 from tavily import TavilyClient
 from openai import OpenAI
 import time
 import json
 import re
+
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
 
 # [NEW] AI 에이전트 및 관세청 API 모듈 불러오기
 try:
@@ -18,24 +26,13 @@ except ImportError:
 
 def run_item_searcher():
     # -------------------------------------------------------------------------
-    # [Setup] 환경 설정
+    # [Setup] 환경 설정 (클라우드 + 로컬 지원)
     # -------------------------------------------------------------------------
-    current_dir = os.path.dirname(os.path.abspath(__file__)) 
-    root_dir = os.path.dirname(os.path.dirname(current_dir))
-    env_path = os.path.join(root_dir, '.env')
-    
-    # .env 로드 시도 (경로가 다를 경우를 대비해 상위 폴더도 체크 가능)
-    if not load_dotenv(dotenv_path=env_path):
-        # 혹시 못 찾으면 상위 폴더의 .env도 시도
-        load_dotenv() 
-
-    # API 키 확인
-    TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
-    # OPEN_AI_API (자네 설정) 또는 OPENAI_API_KEY (기본) 둘 다 체크
-    OPENAI_API_KEY = os.getenv("OPEN_API_KEY") or os.getenv("OPENAI_API_KEY")
+    TAVILY_API_KEY = get_env("TAVILY_API_KEY")
+    OPENAI_API_KEY = get_env("OPENAI_API_KEY")
 
     if not TAVILY_API_KEY or not OPENAI_API_KEY:
-        st.error("🚨 API 키 오류: .env 파일의 TAVILY_API_KEY 또는 OPEN_AI_API를 확인하세요.")
+        st.error("🚨 API 키 오류: TAVILY_API_KEY 또는 OPENAI_API_KEY를 확인하세요.")
         return
 
     tavily_client = TavilyClient(api_key=TAVILY_API_KEY)

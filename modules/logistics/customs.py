@@ -1,7 +1,15 @@
 import os
+import sys
 import json
 from openai import OpenAI
-from dotenv import load_dotenv
+
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from config import get_env
 
 class CustomsBroker:
     """
@@ -9,9 +17,8 @@ class CustomsBroker:
     자연어 검색 -> HS Code & 관세율 동시 추론
     """
     def __init__(self):
-        # 환경변수 로드
-        load_dotenv()
-        api_key = os.getenv("OPENAI_API_KEY")
+        # 클라우드 + 로컬 환경 지원
+        api_key = get_env("OPENAI_API_KEY")
         self.client = OpenAI(api_key=api_key) if api_key else None
 
     # [중요] 여기 'country' 파라미터가 있어야 에러가 안 납니다!

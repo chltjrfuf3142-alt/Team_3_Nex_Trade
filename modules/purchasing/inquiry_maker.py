@@ -1,17 +1,20 @@
 import streamlit as st
 import os
-from dotenv import load_dotenv
+import sys
 from openai import OpenAI
 
-# =========================================================================
-# [Setup] 환경 설정
-# =========================================================================
+# 경로 설정
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(os.path.dirname(current_dir))
-env_path = os.path.join(root_dir, '.env')
-load_dotenv(dotenv_path=env_path)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("OPEN_AI_API_KEY")
+from config import get_env
+
+# =========================================================================
+# [Setup] 환경 설정 (클라우드 + 로컬 지원)
+# =========================================================================
+OPENAI_API_KEY = get_env("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 # [수정 1] 함수 인자에 'extra_options' 추가 (기본값 빈 리스트)
