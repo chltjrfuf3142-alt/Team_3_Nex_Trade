@@ -646,28 +646,17 @@ def run_offer_generator():
         st.markdown("---")
     elif 'preview_docx' in st.session_state:
         st.markdown("---")
-        st.info("💡 PDF 미리보기는 로컬 환경에서만 지원됩니다. Word 파일을 다운로드하세요.")
-        
-        # 다운로드 버튼들
-        col1, col2 = st.columns(2)
-        with col1:
-            st.download_button(
-                label="📥 PDF 다운로드",
-                data=st.session_state['preview_pdf'],
-                file_name=f"{st.session_state.get('preview_filename', 'Preview')}.pdf",
-                mime="application/pdf",
-                use_container_width=True,
-                type="secondary"
-            )
-        with col2:
-            st.download_button(
-                label="📥 Word 다운로드",
-                data=st.session_state['preview_docx'],
-                file_name=f"{st.session_state.get('preview_filename', 'Preview')}.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                use_container_width=True,
-                type="secondary"
-            )
+        st.info("💡 PDF 미리보기가 지원되지 않는 환경입니다. Word 파일을 다운로드하세요.")
+
+        # Word 다운로드만 표시
+        st.download_button(
+            label="📥 Word 다운로드",
+            data=st.session_state['preview_docx'],
+            file_name=f"{st.session_state.get('preview_filename', 'Preview')}.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            use_container_width=True,
+            type="primary"
+        )
 
     st.markdown("---")
     
