@@ -13,9 +13,43 @@ import zipfile
 import streamlit as st
 import pandas as pd
 from docx import Document
-from docx2pdf import convert
 import tempfile
 import base64
+
+# docx2pdf는 클라우드에서 작동하지 않음 (Microsoft Word 필요)
+try:
+    from docx2pdf import convert
+    HAS_DOCX2PDF = True
+except ImportError:
+    HAS_DOCX2PDF = False
+
+import subprocess
+import shutil
+
+def convert_docx_to_pdf_libreoffice(docx_path, output_dir):
+    """LibreOffice를 사용한 DOCX -> PDF 변환 (클라우드용)"""
+    try:
+        libreoffice_path = shutil.which('libreoffice') or shutil.which('soffice')
+        if not libreoffice_path:
+            return None
+
+        subprocess.run([
+            libreoffice_path,
+            '--headless',
+            '--convert-to', 'pdf',
+            '--outdir', output_dir,
+            docx_path
+        ], check=True, timeout=60)
+
+        pdf_filename = os.path.basename(docx_path).replace('.docx', '.pdf')
+        pdf_path = os.path.join(output_dir, pdf_filename)
+
+        if os.path.exists(pdf_path):
+            return pdf_path
+        return None
+    except Exception as e:
+        print(f"LibreOffice 변환 오류: {e}")
+        return None
 
 # 모듈 import
 from modules.sales.dashboard import fetch_dashboard_data, draw_candlestick_chart, generate_analysis
@@ -559,48 +593,60 @@ def run_offer_generator():
                 
                 # Word 문서 생성
                 doc_buf = create_offer_sheet(preview_form_data, preview_items, signature_img=None, labels=preview_labels)
-                
-                # 임시 파일로 저장 후 PDF 변환
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.docx') as tmp_docx:
-                    tmp_docx.write(doc_buf.getvalue())
-                    docx_path = tmp_docx.name
-                
-                pdf_path = docx_path.replace('.docx', '.pdf')
-                
-                # PDF 변환 (docx2pdf 사용)
-                convert(docx_path, pdf_path)
-                
-                # PDF 읽기
-                with open(pdf_path, 'rb') as f:
-                    pdf_bytes = f.read()
-                
-                # 세션에 저장
-                st.session_state['preview_pdf'] = pdf_bytes
+
+                # 세션에 Word 파일 저장
                 st.session_state['preview_docx'] = doc_buf.getvalue()
                 lang_suffix = f"_{target_language}" if target_language else "_EN"
                 st.session_state['preview_filename'] = f"Preview_OfferSheet_{offer_no}{lang_suffix}"
-                
-                # 임시 파일 정리
-                os.unlink(docx_path)
-                os.unlink(pdf_path)
-                
+
+                # PDF 변환 (docx2pdf 또는 LibreOffice 사용)
+                try:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.docx') as tmp_docx:
+                        tmp_docx.write(doc_buf.getvalue())
+                        docx_path = tmp_docx.name
+
+                    output_dir = os.path.dirname(docx_path)
+
+                    if HAS_DOCX2PDF:
+                        # 로컬: docx2pdf 사용
+                        pdf_path = docx_path.replace('.docx', '.pdf')
+                        convert(docx_path, pdf_path)
+                    else:
+                        # 클라우드: LibreOffice 사용
+                        pdf_path = convert_docx_to_pdf_libreoffice(docx_path, output_dir)
+
+                    if pdf_path and os.path.exists(pdf_path):
+                        with open(pdf_path, 'rb') as f:
+                            st.session_state['preview_pdf'] = f.read()
+                        os.unlink(pdf_path)
+                    else:
+                        st.session_state['preview_pdf'] = None
+
+                    os.unlink(docx_path)
+                except Exception as e:
+                    print(f"PDF 변환 오류: {e}")
+                    st.session_state['preview_pdf'] = None
+
                 st.success("✅ 미리보기 생성 완료!")
                 
             except Exception as e:
                 st.error(f"미리보기 생성 실패: {e}")
                 st.exception(e)
 
-    # PDF 미리보기 표시
-    if 'preview_pdf' in st.session_state:
+    # PDF 미리보기 표시 (로컬에서만 가능)
+    if 'preview_pdf' in st.session_state and st.session_state['preview_pdf']:
         st.markdown("---")
         st.markdown("#### 📄 문서 미리보기")
-        
+
         # PDF를 base64로 인코딩하여 iframe으로 표시
         base64_pdf = base64.b64encode(st.session_state['preview_pdf']).decode('utf-8')
         pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800" type="application/pdf"></iframe>'
         st.markdown(pdf_display, unsafe_allow_html=True)
-        
+
         st.markdown("---")
+    elif 'preview_docx' in st.session_state:
+        st.markdown("---")
+        st.info("💡 PDF 미리보기는 로컬 환경에서만 지원됩니다. Word 파일을 다운로드하세요.")
         
         # 다운로드 버튼들
         col1, col2 = st.columns(2)

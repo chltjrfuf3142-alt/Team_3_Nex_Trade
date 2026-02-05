@@ -15,9 +15,13 @@ def get_env(key: str, default: str = None) -> str:
     """
     # 1. Streamlit Cloud secrets 확인
     try:
-        if key in st.secrets:
-            return st.secrets[key]
-    except:
+        # st.secrets가 존재하고 비어있지 않은지 확인
+        if hasattr(st, 'secrets') and len(st.secrets) > 0:
+            if key in st.secrets:
+                return st.secrets[key]
+    except (FileNotFoundError, AttributeError, KeyError, TypeError):
+        pass
+    except Exception:
         pass
 
     # 2. 로컬 환경변수 확인

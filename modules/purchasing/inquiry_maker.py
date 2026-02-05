@@ -14,14 +14,19 @@ from config import get_env
 # =========================================================================
 # [Setup] 환경 설정 (클라우드 + 로컬 지원)
 # =========================================================================
-OPENAI_API_KEY = get_env("OPENAI_API_KEY")
-client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+def get_openai_client():
+    """OpenAI 클라이언트를 함수 호출 시점에 생성 (Streamlit 초기화 이후)"""
+    api_key = get_env("OPENAI_API_KEY")
+    if api_key:
+        return OpenAI(api_key=api_key)
+    return None
 
 # [수정 1] 함수 인자에 'extra_options' 추가 (기본값 빈 리스트)
 def generate_draft(supplier_name, my_info, item_info, extra_options=[]):
     """OpenAI를 이용해 비즈니스 메일 초안 생성"""
-    if not client: 
-        return "⚠️ 오류: .env 파일에서 API 키를 찾을 수 없습니다."
+    client = get_openai_client()
+    if not client:
+        return "⚠️ 오류: API 키를 찾을 수 없습니다. secrets 설정을 확인하세요."
     
     # [수정 2] 추가 옵션이 있을 경우 프롬프트에 넣을 텍스트 생성
     extra_req_text = ""
@@ -116,8 +121,8 @@ def run_inquiry_maker():
 
             with c2:
                 if st.button(f"초안 생성", key=f"btn_{idx}"):
-                    if not client:
-                         st.error("API 키 오류")
+                    if not get_openai_client():
+                         st.error("API 키 오류: secrets 설정을 확인하세요.")
                     else:
                         with st.spinner("AI가 비즈니스 메일을 작성 중입니다..."):
                             my_info = {"company": my_company, "name": my_name}

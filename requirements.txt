@@ -18,6 +18,7 @@ tavily-python
 
 # Document Generation
 python-docx
+reportlab
 
 # Visualization
 plotly
