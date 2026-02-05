@@ -509,3 +509,4 @@ CSV → Pandas → AI 처리 → Streamlit UI → 내보내기 (CSV/DOCX/XLSX)
 ---
 
 **© 2026 TradeNex - AI 기반 글로벌 무역 통합 시스템 v2.0**
+"# Team_3_Nex_Trade" 
